@@ -77,8 +77,10 @@ public class GreetingsController {
     @ResponseBody
     public ResponseEntity<String> deletar(@RequestParam Long idUser){
     	
-    	usuarioRepository.deleteById(idUser);
-    	
-    	return new ResponseEntity<String>("Usuário deletado com sucesso", HttpStatus.OK);
+    	return usuarioRepository.findById(idUser)
+    			.map(user -> {
+    	               usuarioRepository.deleteById(idUser);
+    	               return new ResponseEntity<String>("Usuário deletado com sucesso", HttpStatus.OK);
+    	           }).orElse( new ResponseEntity<String>("Usuário não existe", HttpStatus.OK));
     }
 }
