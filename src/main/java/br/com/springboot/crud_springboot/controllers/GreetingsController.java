@@ -45,12 +45,9 @@ public class GreetingsController {
 	@RequestMapping(value = "/olamundo/{nome}", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public String retornaNome(@PathVariable String nome) {
-
 		Usuario usuario = new Usuario();
 		usuario.setNome(nome);
-
 		usuarioRepository.save(usuario);
-
 		return "Olá mundo " + nome;
 	}
 
@@ -58,9 +55,7 @@ public class GreetingsController {
 	@GetMapping(value = "/listartodos")
 	@ResponseBody // Retorna os dados para o corpo da resposta
 	public ResponseEntity<List<Usuario>> listarUsuario() {
-
 		List<Usuario> usuarios = usuarioRepository.findAll();
-
 		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
 	}
 
@@ -68,7 +63,6 @@ public class GreetingsController {
 	@GetMapping(value = "/buscarporid")
 	@ResponseBody
 	public ResponseEntity<?> buscarPorId(@RequestParam(name = "idUser") Long idUser) {
-
 		return usuarioRepository.findById(idUser)
 				.map(user -> ResponseEntity.ok().body(user))
 				.orElse(ResponseEntity.notFound().build());
@@ -79,9 +73,7 @@ public class GreetingsController {
 	@PostMapping(value = "/salvar")
 	@ResponseBody
 	public ResponseEntity<Usuario> salvar(@RequestBody Usuario usuario) {
-
 		Usuario user = usuarioRepository.save(usuario);
-
 		return new ResponseEntity<Usuario>(user, HttpStatus.ACCEPTED);
 	}
 
@@ -89,7 +81,6 @@ public class GreetingsController {
 	@DeleteMapping(value = "/delete")
 	@ResponseBody
 	public ResponseEntity<String> deletar(@RequestParam Long idUser) {
-
 		return usuarioRepository.findById(idUser)
 				.map(user -> {
 					usuarioRepository.deleteById(idUser);
@@ -101,24 +92,19 @@ public class GreetingsController {
 	@PutMapping(value = "/atualizar") // mapeia url
 	@ResponseBody // Descrição da resposta
 	public ResponseEntity<?> atualizar(@RequestBody Usuario usuario) {// Recebe dados para salvar
-
 		if (usuario.getId() == null) {// Verifica se o id foi informado
 			return new ResponseEntity<String>("Informe um id para atualizar ", HttpStatus.OK);
 		}
-
 		Usuario user = usuarioRepository.saveAndFlush(usuario);
-
 		return new ResponseEntity<Usuario>(user, HttpStatus.OK);
 	}
 
 	// Método para buscar por parte do nome
 	@GetMapping(value = "/buscarPorNome")
-    @ResponseBody
-    public ResponseEntity<List<Usuario>> buscarPorNome(@RequestParam(name = "nome") String nome){
-    	
+	@ResponseBody
+	public ResponseEntity<List<Usuario>> buscarPorNome(@RequestParam(name = "nome") String nome) {
 		List<Usuario> usuarios = usuarioRepository.buscarPorNome(nome.trim().toUpperCase());
-    	
-    	return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
-    }
+		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
+	}
 
 }
