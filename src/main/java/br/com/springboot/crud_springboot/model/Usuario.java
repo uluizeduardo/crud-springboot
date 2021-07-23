@@ -27,7 +27,7 @@ public class Usuario implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
 	@Getter
 	@Setter
-	private long id;
+	private Long id;
 	
 	@Getter
 	@Setter

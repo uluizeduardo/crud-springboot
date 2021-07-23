@@ -95,4 +95,19 @@ public class GreetingsController {
     	               return new ResponseEntity<String>("Usuário deletado com sucesso", HttpStatus.OK);
     	           }).orElse( new ResponseEntity<String>("Usuário não existe", HttpStatus.OK));
     }
+    
+    //Método para atualizar por ID
+    @PutMapping(value = "/atualizar")//mapeia url
+    @ResponseBody //Descrição da resposta 
+    public ResponseEntity<?> atualizar(@RequestBody Usuario usuario){//Recebe dados para salvar 
+    	
+    	if(usuario.getId() == null) {//Verifica se o id foi informado
+    		return new ResponseEntity<String>("Informe um id para atualizar ", HttpStatus.OK);
+    	}
+    		
+    	Usuario user = usuarioRepository.saveAndFlush(usuario);
+    	
+    	return new ResponseEntity<Usuario>(user, HttpStatus.OK);
+    }
+    
 }
