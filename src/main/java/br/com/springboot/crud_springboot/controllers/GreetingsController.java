@@ -27,87 +27,98 @@ import br.com.springboot.crud_springboot.repository.UsuarioRepository;
  */
 @RestController
 public class GreetingsController {
-	
-	@Autowired //Injeção de dependência
+
+	@Autowired // Injeção de dependência
 	private UsuarioRepository usuarioRepository;
-    /**
-     *
-     * @param name the name to greet
-     * @return greeting text
-     */
-    @RequestMapping(value = "/mostrarnome/{name}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public String greetingText(@PathVariable String name) {
-        return "Hello " + name + "!";
-    }
-    
-    @RequestMapping(value = "/olamundo/{nome}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public String retornaNome(@PathVariable String nome) {
+
+	/**
+	 *
+	 * @param name the name to greet
+	 * @return greeting text
+	 */
+	@RequestMapping(value = "/mostrarnome/{name}", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	public String greetingText(@PathVariable String name) {
+		return "Hello " + name + "!";
+	}
+
+	@RequestMapping(value = "/olamundo/{nome}", method = RequestMethod.GET)
+	@ResponseStatus(HttpStatus.OK)
+	public String retornaNome(@PathVariable String nome) {
+
+		Usuario usuario = new Usuario();
+		usuario.setNome(nome);
+
+		usuarioRepository.save(usuario);
+
+		return "Olá mundo " + nome;
+	}
+
+	// Método para listar todos os usuários do banco de dados
+	@GetMapping(value = "/listartodos")
+	@ResponseBody // Retorna os dados para o corpo da resposta
+	public ResponseEntity<List<Usuario>> listarUsuario() {
+
+		List<Usuario> usuarios = usuarioRepository.findAll();
+
+		return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
+	}
+
+	// Método para buscar por Id
+	@GetMapping(value = "/buscarporid")
+	@ResponseBody
+	public ResponseEntity<?> buscarPorId(@RequestParam(name = "idUser") Long idUser) {
+
+		return usuarioRepository.findById(idUser)
+				.map(user -> ResponseEntity.ok().body(user))
+				.orElse(ResponseEntity.notFound().build());
+
+	}
+
+	// Método para salvar usuário dentro do banco de dados
+	@PostMapping(value = "/salvar")
+	@ResponseBody
+	public ResponseEntity<Usuario> salvar(@RequestBody Usuario usuario) {
+
+		Usuario user = usuarioRepository.save(usuario);
+
+		return new ResponseEntity<Usuario>(user, HttpStatus.ACCEPTED);
+	}
+
+	// Método para deletar usuário por ID
+	@DeleteMapping(value = "/delete")
+	@ResponseBody
+	public ResponseEntity<String> deletar(@RequestParam Long idUser) {
+
+		return usuarioRepository.findById(idUser)
+				.map(user -> {
+					usuarioRepository.deleteById(idUser);
+					return new ResponseEntity<String>("Usuário deletado com sucesso", HttpStatus.OK);
+				}).orElse(new ResponseEntity<String>("Usuário não existe", HttpStatus.OK));
+	}
+
+	// Método para atualizar por ID
+	@PutMapping(value = "/atualizar") // mapeia url
+	@ResponseBody // Descrição da resposta
+	public ResponseEntity<?> atualizar(@RequestBody Usuario usuario) {// Recebe dados para salvar
+
+		if (usuario.getId() == null) {// Verifica se o id foi informado
+			return new ResponseEntity<String>("Informe um id para atualizar ", HttpStatus.OK);
+		}
+
+		Usuario user = usuarioRepository.saveAndFlush(usuario);
+
+		return new ResponseEntity<Usuario>(user, HttpStatus.OK);
+	}
+
+	// Método para buscar por parte do nome
+	@GetMapping(value = "/buscarPorNome")
+    @ResponseBody
+    public ResponseEntity<List<Usuario>> buscarPorNome(@RequestParam(name = "nome") String nome){
     	
-    	Usuario usuario = new Usuario();
-    	usuario.setNome(nome);
-    	
-    	usuarioRepository.save(usuario);
-    	
-    	return "Olá mundo " + nome;
-    }
-    
-    //Método para listar todos os usuários do banco de dados
-    @GetMapping(value = "/listartodos")
-    @ResponseBody// Retorna os dados para o corpo da resposta
-    public ResponseEntity<List<Usuario>> listarUsuario(){
-    	
-    	List<Usuario> usuarios = usuarioRepository.findAll();
+		List<Usuario> usuarios = usuarioRepository.buscarPorNome(nome.trim().toUpperCase());
     	
     	return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
     }
-    
-    //Método para buscar por Id
-    @GetMapping(value = "/buscarporid")
-    @ResponseBody
-    public ResponseEntity<?> buscarPorId(@RequestParam(name = "idUser") Long idUser){
-    	
-    	return usuarioRepository.findById(idUser)
-    	           .map(user -> ResponseEntity.ok().body(user))
-    	           .orElse(ResponseEntity.notFound().build());
-    	
-    }
-    
-    //Método para salvar usuário dentro do banco de dados
-    @PostMapping(value = "/salvar")
-    @ResponseBody
-    public ResponseEntity<Usuario> salvar(@RequestBody Usuario usuario){
-    	
-    	Usuario user = usuarioRepository.save(usuario);
-    	
-    	return new ResponseEntity<Usuario>(user, HttpStatus.ACCEPTED);
-    }
-    
-    //Método para deletar usuário por ID
-    @DeleteMapping(value = "/delete")
-    @ResponseBody
-    public ResponseEntity<String> deletar(@RequestParam Long idUser){
-    	
-    	return usuarioRepository.findById(idUser)
-    			.map(user -> {
-    	               usuarioRepository.deleteById(idUser);
-    	               return new ResponseEntity<String>("Usuário deletado com sucesso", HttpStatus.OK);
-    	           }).orElse( new ResponseEntity<String>("Usuário não existe", HttpStatus.OK));
-    }
-    
-    //Método para atualizar por ID
-    @PutMapping(value = "/atualizar")//mapeia url
-    @ResponseBody //Descrição da resposta 
-    public ResponseEntity<?> atualizar(@RequestBody Usuario usuario){//Recebe dados para salvar 
-    	
-    	if(usuario.getId() == null) {//Verifica se o id foi informado
-    		return new ResponseEntity<String>("Informe um id para atualizar ", HttpStatus.OK);
-    	}
-    		
-    	Usuario user = usuarioRepository.saveAndFlush(usuario);
-    	
-    	return new ResponseEntity<Usuario>(user, HttpStatus.OK);
-    }
-    
+
 }
