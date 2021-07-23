@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,6 +61,17 @@ public class GreetingsController {
     	List<Usuario> usuarios = usuarioRepository.findAll();
     	
     	return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
+    }
+    
+    //Método para buscar por Id
+    @GetMapping(value = "/buscarporid")
+    @ResponseBody
+    public ResponseEntity<?> buscarPorId(@RequestParam(name = "idUser") Long idUser){
+    	
+    	return usuarioRepository.findById(idUser)
+    	           .map(user -> ResponseEntity.ok().body(user))
+    	           .orElse(ResponseEntity.notFound().build());
+    	
     }
     
     //Método para salvar usuário dentro do banco de dados
